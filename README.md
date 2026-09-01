@@ -13,6 +13,8 @@ provider intact while adding the maintenance bridge needed for usage data.
 
 - Shows the current Grok Build subscription, such as `SuperGrok Heavy`.
 - Reports the active credit window, percentage used, and reset time.
+- Exposes low, medium, high, and extra-high reasoning efforts in BB, with
+  extra-high forwarded to Grok's `--reasoning-effort xhigh` option.
 - Supports the current weekly credit response and the legacy monthly counter
   response.
 - Reuses bb's normal provider health, sign-in, and expired-session states.

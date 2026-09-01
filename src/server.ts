@@ -1,7 +1,7 @@
 import type { BbPluginApi } from "@get-bb/plugin-sdk";
 import type { AcpLaunchSpec } from "@get-bb/plugin-sdk/provider-bridge/acp";
 
-const GROK_LAUNCH_SPEC = {
+export const GROK_LAUNCH_SPEC = {
   displayName: "Grok Build",
   command: "grok",
   args: ["agent", "stdio"],
@@ -17,10 +17,10 @@ const GROK_LAUNCH_SPEC = {
   },
   reasoningCli: {
     flag: "--reasoning-effort",
-    supportedLevels: ["low", "medium", "high"],
+    supportedLevels: ["low", "medium", "high", "xhigh"],
     levelValues: {
       none: "low",
-      xhigh: "high",
+      xhigh: "xhigh",
       ultracode: "high",
       max: "high",
     },
@@ -60,7 +60,7 @@ export default function plugin(bb: BbPluginApi) {
       supportsThreadArchive: false,
       supportsThreadRename: false,
       permissionModes: ["accept-edits", "full"],
-      reasoningLevels: ["low", "medium", "high"],
+      reasoningLevels: ["low", "medium", "high", "xhigh"],
     },
     composerActions: ["goal", "plan"],
     strings: {
@@ -78,6 +78,7 @@ export default function plugin(bb: BbPluginApi) {
       { id: "low", label: "Low" },
       { id: "medium", label: "Medium" },
       { id: "high", label: "High" },
+      { id: "xhigh", label: "Extra High" },
     ],
     models: { scope: "host" },
     experimental_nativeSkillRoots: GROK_LAUNCH_SPEC.nativeSkillRoots,

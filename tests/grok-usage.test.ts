@@ -2,6 +2,17 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { parseBillingUsage, parseSubscriptionTier } from "../src/grok-usage.ts";
+import { GROK_LAUNCH_SPEC } from "../src/server.ts";
+
+test("exposes Grok's xhigh effort and forwards it to the CLI", () => {
+  assert.deepEqual(GROK_LAUNCH_SPEC.reasoningCli.supportedLevels, [
+    "low",
+    "medium",
+    "high",
+    "xhigh",
+  ]);
+  assert.equal(GROK_LAUNCH_SPEC.reasoningCli.levelValues?.xhigh, "xhigh");
+});
 
 test("parses the current subscription from Grok settings", () => {
   assert.equal(
