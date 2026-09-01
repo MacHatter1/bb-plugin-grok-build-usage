@@ -1,0 +1,32 @@
+{
+  "name": "bb-plugin-grok-build-usage",
+  "version": "0.1.0",
+  "type": "module",
+  "engines": {
+    "bb": ">=0.40",
+    "bbPluginSdk": ">=0.4.21"
+  },
+  "bb": {
+    "name": "Grok Build Usage",
+    "description": "Adds Grok Build subscription usage to BB's Settings → Usage Limits page.",
+    "branding": {
+      "icon": "./assets/icons/grok.svg"
+    },
+    "server": "./src/server.ts",
+    "host": "./src/host.ts"
+  },
+  "scripts": {
+    "test": "node --experimental-strip-types --test tests/grok-usage.test.ts"
+  },
+  "dependencies": {
+    "@get-bb/plugin-sdk": "0.4.21",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "hono": "^4.11.9",
+    "typescript": "^5.7.0"
+  }
+}
