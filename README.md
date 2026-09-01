@@ -3,6 +3,8 @@
 This bb plugin adds live Grok Build subscription and usage information to
 **Settings → Usage Limits**.
 
+![Grok Build usage in bb](assets/showcase/grok-build-usage.png)
+
 It registers a companion provider because bb's built-in ACP provider already
 owns the `acp-grok` id. The companion keeps the existing Grok Build execution
 provider intact while adding the maintenance bridge needed for usage data.
