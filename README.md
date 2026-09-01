@@ -41,11 +41,12 @@ Once this repository is published, the marketplace submission should provide
 the canonical Git URL. A Git-based install will then look like:
 
 ```sh
-bb plugin install git:https://github.com/<owner>/bb-plugin-grok-build-usage.git@main
+bb plugin install git:https://github.com/MacHatter1/bb-plugin-grok-build-usage.git@main
 ```
 
-The owner and repository URL are intentionally placeholders until the
-repository destination is chosen.
+This assumes the repository is published as
+`MacHatter1/bb-plugin-grok-build-usage`. Update the URL if the final
+marketplace repository uses a different owner or name.
 
 ## Development
 
