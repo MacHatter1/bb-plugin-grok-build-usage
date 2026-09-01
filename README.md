@@ -106,16 +106,3 @@ The integration depends on the Grok CLI's local credential format and its
 authenticated billing and settings endpoints. Those interfaces may change
 without notice. If a request fails, bb reports the provider's health or usage
 error so the failure remains visible instead of being presented as valid usage.
-
-## Publishing checklist
-
-Before opening the marketplace PR:
-
-1. Choose the public repository owner and URL.
-2. Add the Git remote and push the `main` branch.
-3. Confirm a clean checkout can run the development commands above.
-4. Submit the marketplace PR with the public repository URL and plugin
-   version.
-
-The current local checkout is intentionally prepared without a remote or a
-push destination.
