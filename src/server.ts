@@ -1,6 +1,8 @@
 import type { BbPluginApi } from "@get-bb/plugin-sdk";
 import type { AcpLaunchSpec } from "@get-bb/plugin-sdk/provider-bridge/acp";
 
+import { registerUsageSource } from "./usage-source.ts";
+
 export const GROK_LAUNCH_SPEC = {
   displayName: "Grok Build",
   command: "grok",
@@ -36,6 +38,8 @@ export const GROK_LAUNCH_SPEC = {
 } satisfies AcpLaunchSpec;
 
 export default function plugin(bb: BbPluginApi) {
+  registerUsageSource(bb);
+
   bb.providers.register({
     // `acp-grok` is owned by bb's built-in ACP plugin. This companion id keeps
     // the existing execution provider untouched while adding usage support.
