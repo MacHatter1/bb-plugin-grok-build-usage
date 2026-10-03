@@ -12,10 +12,14 @@ const plan = z.object({
   id: z.string().min(1),
   multiplier: z.number().int().positive().nullable(),
 });
+// `sdk.system.usageLimits` only carries `accountEmail`/`planLabel` for the ok and
+// error states; `not_installed`, `unauthenticated` and `expired` arrive as a bare
+// `{ status }`. bb's consumer requires both keys on every state (they render the
+// provider's signInHint/expiredHint), so default them instead of demanding them.
 const account = {
   plan: plan.nullable().default(null),
-  accountEmail: z.string().nullable(),
-  planLabel: z.string().nullable(),
+  accountEmail: z.string().nullable().default(null),
+  planLabel: z.string().nullable().default(null),
 };
 const windowSchema = z.object({
   kind: z.enum(["five-hour", "daily", "weekly", "custom"]).default("custom"),

@@ -76,13 +76,35 @@ test("getResource returns windows from usageLimits", async () => {
   assert.equal(result.usage.windows[0].kind, "custom");
 });
 
-test("getResource passes through non-ok states", async () => {
-  const { handlers } = setup({ status: "expired", accountEmail: null, planLabel: null });
+// bb's `usageLimits` returns a bare `{ status }` for these states, so the source
+// has to supply the account fields its consumer requires.
+for (const status of ["not_installed", "unauthenticated", "expired"] as const) {
+  test(`getResource passes through the bare ${status} state`, async () => {
+    const { handlers } = setup({ status });
+    const result = (await handlers[GET_RESOURCE]({
+      resourceId: JSON.stringify(["host_1", "grok-build-usage"]),
+      refresh: true,
+    } as never)) as { usage: { status: string; accountEmail: string | null; planLabel: string | null } };
+    assert.equal(result.usage.status, status);
+    assert.equal(result.usage.accountEmail, null);
+    assert.equal(result.usage.planLabel, null);
+  });
+}
+
+test("getResource keeps the host's error message", async () => {
+  const { handlers } = setup({
+    status: "error",
+    message: "Grok Build billing request timed out",
+    accountEmail: "a@b.c",
+    planLabel: null,
+  });
   const result = (await handlers[GET_RESOURCE]({
     resourceId: JSON.stringify(["host_1", "grok-build-usage"]),
     refresh: true,
-  } as never)) as { usage: { status: string } };
-  assert.equal(result.usage.status, "expired");
+  } as never)) as { usage: { status: string; message?: string; accountEmail: string | null } };
+  assert.equal(result.usage.status, "error");
+  assert.equal(result.usage.message, "Grok Build billing request timed out");
+  assert.equal(result.usage.accountEmail, "a@b.c");
 });
 
 test("getResource rejects resources for other providers", async () => {
