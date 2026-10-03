@@ -22,7 +22,7 @@ provider intact while adding the maintenance bridge needed for usage data.
 
 ## Requirements
 
-- bb `>=0.40`.
+- bb `>=0.44`.
 - Grok Build installed with the `grok` command available on `PATH`.
 - An authenticated Grok Build session created with:
 
@@ -73,9 +73,11 @@ and installed dependencies are ignored by Git.
 ├── src/
 │   ├── grok-usage.ts       # Auth, health, subscription, and usage logic
 │   ├── host.ts             # ACP and maintenance bridge
-│   └── server.ts           # Provider registration and metadata
+│   ├── server.ts           # Provider registration and metadata
+│   └── usage-source.ts      # Discoverable usage-limit source
 ├── tests/
-│   └── grok-usage.test.ts  # Pure usage and subscription parsing tests
+│   ├── grok-usage.test.ts  # Pure usage and subscription parsing tests
+│   └── usage-source.test.ts # Provider usage-source contract tests
 ├── package.json
 ├── package-lock.json
 └── tsconfig.json
