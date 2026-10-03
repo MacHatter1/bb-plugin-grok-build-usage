@@ -25,6 +25,8 @@
     "src/server.ts",
     "src/host.ts",
     "src/grok-usage.ts",
-    "tests/grok-usage.test.ts"
+    "src/usage-source.ts",
+    "tests/grok-usage.test.ts",
+    "tests/usage-source.test.ts"
   ]
 }
