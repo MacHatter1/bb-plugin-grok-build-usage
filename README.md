@@ -1,56 +1,153 @@
-# Grok Build Usage for bb
+<div align="center">
 
-This bb plugin adds live Grok Build subscription and usage information to
-**Settings → Usage Limits**.
+<img src="docs/logo.svg" width="96" height="96" alt="Grok Build Usage logo">
 
-![Grok Build usage in bb](assets/showcase/grok-build-usage.png)
+# Grok Build Usage
 
-It registers a companion provider because bb's built-in ACP provider already
-owns the `acp-grok` id. The companion keeps the existing Grok Build execution
-provider intact while adding the maintenance bridge needed for usage data.
+### See your Grok Build credits in bb.
+
+Track Grok Build plans, credit windows and reset times beside your other bb provider usage.<br>
+Sign-in and expired-session states stay visible instead of becoming silent failures.
+
+![Licence: MIT](https://img.shields.io/badge/licence-MIT-blue)
+![bb ≥ 0.44](https://img.shields.io/badge/bb-%E2%89%A5%200.44-0f766e)
+![Plugin SDK ≥ 0.5.29](https://img.shields.io/badge/plugin%20sdk-%E2%89%A5%200.5.29-06b6d4)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)
+
+[Features](#features) · [Install](#install) · [Where to find it](#where-to-find-it) · [How it works](#how-it-works) · [Privacy](#privacy) · [Development](#development)
+
+<br>
+
+<img src="docs/screenshots/usage.png" alt="Grok Build usage card showing a weekly credit window" width="900">
+
+</div>
+
+<br>
+
+> [!NOTE]
+> The screenshot is a real BB capture populated with fictional demo data.
+
+## The problem
+
+When you use Grok Build through bb, its execution provider can work while its
+subscription usage is missing from bb's Usage Limits view. You have to switch
+to another tool to check credits, and an expired login can look like a generic
+collection failure.
+
+This plugin adds a discoverable usage source for Grok Build. You get the plan,
+credit window, usage percentage and reset time in the same place as your other
+providers, with actionable sign-in guidance when needed.
+
+|  | Without Grok Build Usage | With Grok Build Usage |
+| --- | :---: | :---: |
+| Grok Build appears in Usage Limits | ❌ | ✅ Host usage card |
+| Credit window and reset time | ❌ | ✅ Live billing data |
+| Expired or signed-out guidance | ❌ | ✅ bb status message |
 
 ## Features
 
-- Shows the current Grok Build subscription, such as `SuperGrok Heavy`.
-- Reports the active credit window, percentage used, and reset time.
-- Exposes low, medium, high, and extra-high reasoning efforts in BB, with
-  extra-high forwarded to Grok's `--reasoning-effort xhigh` option.
-- Supports the current weekly credit response and the legacy monthly counter
-  response.
-- Reuses bb's normal provider health, sign-in, and expired-session states.
-- Uses the Grok icon in the provider and usage-limit surfaces.
+<table>
+<tr>
+<td width="50%" valign="top">
 
-## Requirements
+### 📊 Live credit windows
 
-- bb `>=0.44`.
-- Grok Build installed with the `grok` command available on `PATH`.
-- An authenticated Grok Build session created with:
+See the active weekly or monthly credit window, percentage used and reset time.
 
-  ```sh
-  grok login
-  ```
+</td>
+<td width="50%" valign="top">
 
-If Grok Build is not installed or signed in, bb shows the normal provider
-status and sign-in guidance.
+### 🧾 Plan details
+
+Show the current Grok Build plan label when the settings endpoint provides it.
+
+</td>
+</tr>
+<tr>
+<td valign="top">
+
+### 🔐 Useful status states
+
+Not-installed, signed-out, expired and billing-error states remain distinguishable.
+
+</td>
+<td valign="top">
+
+### 🖥️ Host-aware resources
+
+Usage is listed per connected host that owns the Grok Build provider.
+
+</td>
+</tr>
+</table>
 
 ## Install
 
-Install from a local checkout while developing:
-
 ```sh
-bb plugin install /path/to/bb-plugin-grok-build-usage --yes
+bb plugin install git:https://github.com/MacHatter1/bb-plugin-grok-build-usage --yes
 ```
 
-Once this repository is published, the marketplace submission should provide
-the canonical Git URL. A Git-based install will then look like:
+Install Grok Build on the host, run `grok login`, then open bb's Usage Limits page.
+
+<details>
+<summary><b>Install from a local clone</b></summary>
 
 ```sh
-bb plugin install git:https://github.com/MacHatter1/bb-plugin-grok-build-usage.git@main
+git clone https://github.com/MacHatter1/bb-plugin-grok-build-usage
+cd bb-plugin-grok-build-usage
+npm install && bb plugin build
+bb plugin install path:$PWD --yes
 ```
 
-This assumes the repository is published as
-`MacHatter1/bb-plugin-grok-build-usage`. Update the URL if the final
-marketplace repository uses a different owner or name.
+</details>
+
+**Requirements**
+
+- bb **0.44+** (Plugin SDK 0.5.29+)
+- Grok Build installed with the `grok` command available on `PATH`
+- An authenticated session created with `grok login`
+
+## Where to find it
+
+| Where | What |
+| --- | --- |
+| **Settings → Usage Limits** | View Grok Build plan, credit usage, reset time and status guidance. |
+
+## How it works
+
+```mermaid
+sequenceDiagram
+    participant BB as bb Usage Limits
+    participant Source as Grok usage source
+    participant Host as Host bridge
+    participant Grok as Grok Build API
+
+    BB->>Source: Discover listResources/getResource
+    Source->>Host: Request usageLimits for host
+    Host->>Host: Read ~/.grok/auth.json
+    Host->>Grok: Fetch billing and settings
+    Grok-->>Host: Plan and credit window
+    Host-->>Source: Normalised usage state
+    Source-->>BB: Usage resource and observation
+```
+
+- **Discovery.** The server registers a `provider-usage.v1` source so bb can list
+  one stable resource for each host that owns the provider.
+- **Host collection.** The host bridge reads the local Grok credential and
+  fetches billing data directly from Grok's endpoints.
+- **Normalisation.** Weekly and legacy monthly responses are converted into bb's
+  usage-window shape, with status states preserved.
+- **Caching.** Successful observations are kept in memory for up to 60 seconds;
+  bb can request a fresh collection.
+
+## Privacy
+
+- 🔒 **Credentials stay local.** The plugin reads `~/.grok/auth.json` on the
+  host and does not expose the token through the usage resource.
+- 🌐 **Network access is limited.** The host contacts Grok's billing and settings
+  endpoints only when collecting usage.
+- 🧹 **No persistent usage store.** Normalised observations are cached in memory
+  and are discarded when the plugin reloads.
 
 ## Development
 
@@ -59,56 +156,26 @@ npm install
 npm test
 npx tsc --noEmit
 bb plugin build
-bb plugin install . --yes
+bb plugin install path:$PWD --yes
+bb plugin dev
 ```
-
-`bb plugin build` writes the generated bundle to `dist/`. The generated bundle
-and installed dependencies are ignored by Git.
-
-## Repository layout
 
 ```text
-.
-├── assets/icons/grok.svg   # Provider branding
-├── src/
-│   ├── grok-usage.ts       # Auth, health, subscription, and usage logic
-│   ├── host.ts             # ACP and maintenance bridge
-│   ├── server.ts           # Provider registration and metadata
-│   └── usage-source.ts      # Discoverable usage-limit source
-├── tests/
-│   ├── grok-usage.test.ts  # Pure usage and subscription parsing tests
-│   └── usage-source.test.ts # Provider usage-source contract tests
-├── package.json
-├── package-lock.json
-└── tsconfig.json
+src/server.ts       provider registration and discoverable usage source
+src/host.ts         ACP and maintenance bridge
+src/grok-usage.ts   credential, health and billing parsing
+src/usage-source.ts provider-usage.v1 resource and observation handlers
+tests/              parser and usage-source contract tests
+docs/               logo and usage screenshot
 ```
 
-## How it works
+**Tests** cover credential and billing parsing, subscription labels, provider
+registration, resource discovery, usage-window normalisation, non-OK states and
+resource validation using a fake plugin host.
 
-The host bridge reads the Grok CLI credential from `~/.grok/auth.json` and
-keeps it in memory for authenticated requests. It fetches usage from Grok
-Build's billing endpoint and supplements the response with the current
-subscription label from the settings endpoint. The billing implementation is
-based on the endpoint flow used by [xAI's Grok Build billing extension](https://github.com/xai-org/grok-build/blob/main/crates/codegen/xai-grok-shell/src/extensions/billing.rs).
+`PLUGIN_OVERVIEW.md` is the store listing. Keep it in step with `bb.description`
+in `package.json`.
 
-The plugin does not replace bb's built-in `acp-grok` provider. Its
-`grok-build-usage` companion id owns the additional maintenance requests while
-delegating ACP traffic to bb's existing bridge.
+## Licence
 
-## Privacy and security
-
-- The plugin reads `~/.grok/auth.json` but never modifies it.
-- Credentials are sent only to the configured Grok Build endpoints and are not
-  logged or persisted by the plugin.
-- Authentication is performed with the session created by `grok login`.
-- Do not commit `auth.json`, generated bundles, or local logs.
-
-Grok Build usage is subject to xAI's account and product policies. The plugin
-is an independent community integration and is not affiliated with xAI or bb.
-
-## Limitations
-
-The integration depends on the Grok CLI's local credential format and its
-authenticated billing and settings endpoints. Those interfaces may change
-without notice. If a request fails, bb reports the provider's health or usage
-error so the failure remains visible instead of being presented as valid usage.
+[MIT](LICENSE)
